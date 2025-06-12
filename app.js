@@ -52,7 +52,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: 'mongodb://127.0.0.1:27017/chatbot'
+    mongoUrl: 'mongodb+srv://reksitrajan01:8n4SHiaJfCZRrimg@cluster0.mperr.mongodb.net/test?retryWrites=true&w=majority'
   }),
   cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
 }));
