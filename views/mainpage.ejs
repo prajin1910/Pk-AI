@@ -733,7 +733,6 @@ body {
     background: var(--card-bg);
     border-top: 1px solid var(--border-color);
     backdrop-filter: blur(20px);
-    padding-bottom: 40px;
     position: sticky;
     bottom: 0;
 }
@@ -1186,6 +1185,7 @@ code {
     
     .chat-input-container {
         padding: 1rem;
+        margin-bottom: 60px;
     }
     
     .sidebar-header {
@@ -1641,8 +1641,6 @@ textarea:focus-visible {
     box-shadow: var(--shadow-medium);
     filter: brightness(1.1);
 }
-
-
     </style>
 </head>
 <body>
@@ -2654,47 +2652,7 @@ async function confirmRenameChat() {
         }, 1500);
     }
 }
-// Add this to your existing JavaScript
-window.addEventListener('load', function() {
-    messageInput.focus();
-    
-    // On mobile, ensure we're scrolled to top initially
-    if (window.innerWidth <= 768) {
-        window.scrollTo(0, 0);
-    }
-    
-    // Check for chatId in URL parameters first
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlChatId = urlParams.get('chatId');
-    
-    if (urlChatId) {
-        // Load the specific chat from URL parameter
-        loadChat(urlChatId);
-        // Clear the URL parameter after loading
-        window.history.replaceState({}, document.title, window.location.pathname);
-    } else {
-        // Load the last active chat if available
-        const savedChatId = getCurrentChatId();
-        if (savedChatId) {
-            // Check if this chat exists in the sidebar
-            const chatItem = document.querySelector(`[data-chat-id="${savedChatId}"]`);
-            if (chatItem) {
-                loadChat(savedChatId);
-            } else {
-                // If not found, start new chat
-                newChat();
-            }
-        }
-    }
-});
 
-// Add this to handle resize events better
-window.addEventListener('resize', function() {
-    if (window.innerWidth <= 768) {
-        // Ensure we're scrolled to top when resizing to mobile
-        window.scrollTo(0, 0);
-    }
-});
 
         // Rename chat prompt
         // Update the renameChatPrompt function to use the modal:
