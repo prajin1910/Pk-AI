@@ -9,13 +9,11 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const uri = "mongodb+srv://reksitrajan01:8n4SHiaJfCZRrimg@cluster0.mperr.mongodb.net/test?retryWrites=true&w=majority";
-mongoose.connect(uri)
-    .then(() => console.log('✅ MongoDB Connected Successfully!'))
-    .catch((err) => {
-        console.error('❌ MongoDB connection error:', err);
-        process.exit(1);
-    });
+// MongoDB connection
+mongoose.connect('mongodb+srv://reksitrajan01:8n4SHiaJfCZRrimg@cluster0.mperr.mongodb.net/test?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -417,6 +415,27 @@ app.get('/chats', requireAuth, async (req, res) => {
         res.status(500).send('Server error');
     }
 });
+
+// Rename chat
+app.put('/api/chat/:chatId/rename', requireAuth, async (req, res) => {
+    try {
+        const chat = await Chat.findOneAndUpdate(
+            { _id: req.params.chatId, userId: req.session.userId },
+            { title: req.body.title },
+            { new: true }
+        );
+        
+        if (!chat) {
+            return res.status(404).json({ success: false, error: 'Chat not found' });
+        }
+        
+        res.json({ success: true, chat });
+    } catch (error) {
+        console.error('Error renaming chat:', error);
+        res.status(500).json({ success: false, error: 'Server error' });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
