@@ -1185,7 +1185,6 @@ code {
     
     .chat-input-container {
         padding: 1rem;
-        margin-bottom: 60px;
     }
     
     .sidebar-header {
@@ -1641,6 +1640,98 @@ textarea:focus-visible {
     box-shadow: var(--shadow-medium);
     filter: brightness(1.1);
 }
+
+/* Add these styles to your existing CSS */
+
+/* Mobile-specific height fixes */
+@media (max-width: 768px) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .chat-container {
+        height: 100vh;
+        height: -webkit-fill-available; /* For mobile browsers */
+        height: fill-available;
+    }
+    
+    .main-chat {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Fix for iOS Safari address bar */
+    @supports (-webkit-touch-callout: none) {
+        .chat-container {
+            height: -webkit-fill-available;
+            min-height: -webkit-fill-available;
+        }
+    }
+    
+    /* Prevent overscroll bounce */
+    .chat-messages {
+        overscroll-behavior-y: contain;
+    }
+    
+    /* Adjust header and input container heights */
+    .chat-header {
+        min-height: 56px;
+        flex-shrink: 0;
+    }
+    
+    .chat-input-container {
+        flex-shrink: 0;
+        padding-bottom: env(safe-area-inset-bottom); /* Account for iPhone notch */
+    }
+    
+    /* Make sure messages take full width */
+    .message {
+        max-width: 100%;
+    }
+    
+    .message-content {
+        max-width: 90%;
+    }
+    
+    /* Fix for Android Chrome */
+    @media (hover: none) {
+        body {
+            position: fixed;
+            width: 100%;
+        }
+    }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+    .message-content {
+        max-width: 88%;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .chat-input-wrapper {
+        border-radius: 18px;
+    }
+    
+    .send-btn {
+        width: 38px;
+        height: 38px;
+    }
+    
+    /* Adjust for mobile browsers with bottom bars */
+    .chat-input-container {
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+}
     </style>
 </head>
 <body>
@@ -1834,7 +1925,8 @@ textarea:focus-visible {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Configuration - Using the working API from your HTML file
-        const API_KEY = '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';
+        const API_KEY = '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';
+        
         const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
         
         let currentChatId = null;
@@ -2379,6 +2471,48 @@ window.addEventListener('load', function() {
     }
 });
     
+
+// Add this to your existing JavaScript
+window.addEventListener('load', function() {
+    messageInput.focus();
+    
+    // On mobile, ensure we're scrolled to top initially
+    if (window.innerWidth <= 768) {
+        window.scrollTo(0, 0);
+    }
+    
+    // Check for chatId in URL parameters first
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlChatId = urlParams.get('chatId');
+    
+    if (urlChatId) {
+        // Load the specific chat from URL parameter
+        loadChat(urlChatId);
+        // Clear the URL parameter after loading
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+        // Load the last active chat if available
+        const savedChatId = getCurrentChatId();
+        if (savedChatId) {
+            // Check if this chat exists in the sidebar
+            const chatItem = document.querySelector(`[data-chat-id="${savedChatId}"]`);
+            if (chatItem) {
+                loadChat(savedChatId);
+            } else {
+                // If not found, start new chat
+                newChat();
+            }
+        }
+    }
+});
+
+// Add this to handle resize events better
+window.addEventListener('resize', function() {
+    if (window.innerWidth <= 768) {
+        // Ensure we're scrolled to top when resizing to mobile
+        window.scrollTo(0, 0);
+    }
+});
     // Prevent form submission on Enter in input
     messageInput.addEventListener('keydown', function(event) {
         if (event.key === 'Enter' && !event.shiftKey) {
